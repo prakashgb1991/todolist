@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import axios from "axios";
-const TutorialsList = (props) => {
-  const [tutorials, setTutorials] = useState([]);
+const TodosList = (props) => {
+  const [todos, setTodos] = useState([]);
   const [searchTitle, setSearchTitle] = useState("");
-  const tutorialsRef = useRef();
+  const todosRef = useRef();
 
-  tutorialsRef.current = tutorials;
+  todosRef.current = todos;
 
  useEffect(() => {
  (async () => {
  const todos = await axios.get(
  "https://jsonplaceholder.typicode.com/todos"
  );
- setTutorials(todos.data);
+ setTodos(todos.data);
  })();
  }, []);
 
@@ -56,7 +56,7 @@ const TutorialsList = (props) => {
     setSortBy
   } = useTable({
     columns,
-    data: tutorials,
+    data: todos,
      initialState: {
                 sortBy: [
                     {
@@ -105,4 +105,4 @@ const TutorialsList = (props) => {
   );
 };
 
-export default TutorialsList;
+export default TodosList;

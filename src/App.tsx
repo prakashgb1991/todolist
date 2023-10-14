@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { COGNITO } from "./configs/aws";
 import ProtectedRoute from "./components/ProtectedRoute";
-import TutorialsList from "./components/TutorialsList";
+import TodosList from "./components/TodosList";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 Amplify.configure({
@@ -32,7 +32,7 @@ const App: React.FC = () => {
             <Confirmation />
           </Route>
           <Route path="/list">
-             <ProtectedRoute component={TutorialsList} />
+             <ProtectedRoute component={TodosList} />
           </Route>
           <Route path="/">
             <ProtectedRoute component={Dashboard} />
