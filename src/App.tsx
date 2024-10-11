@@ -15,6 +15,7 @@ Amplify.configure({
   aws_cognito_region: COGNITO.REGION,
   aws_user_pools_id: COGNITO.USER_POOL_ID,
   aws_user_pools_web_client_id: COGNITO.APP_CLIENT_ID,
+  aws_cognito_identity_pool_id: COGNITO.ID_POOL_ID
 });
 
 const App: React.FC = () => {
@@ -35,7 +36,7 @@ const App: React.FC = () => {
              <ProtectedRoute component={TodosList} />
           </Route>
           <Route path="/">
-            <ProtectedRoute component={Dashboard} />
+            <ProtectedRoute component={TodosList} />
           </Route>
         </Switch>
       </Card>
