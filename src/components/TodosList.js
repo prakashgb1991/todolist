@@ -1,65 +1,21 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useTable, useSortBy, usePagination } from "react-table";
-import { BiFirstPage, BiLastPage } from "react-icons/bi";
-import { MdKeyboardArrowRight, MdKeyboardArrowLeft } from "react-icons/md";
-import { Toast } from "./../utils/notifications";
-import { Auth } from "aws-amplify";
-import LockIcon from "@material-ui/icons/Lock";
-import { useHistory } from "react-router-dom";
+import { useTable, useSortBy } from "react-table";
 import axios from "axios";
 const TodosList = (props) => {
   const [todos, setTodos] = useState([]);
-  const[userId, setUserId] = useState("test");
   const [searchTitle, setSearchTitle] = useState("");
   const todosRef = useRef();
- const history = useHistory();
+
   todosRef.current = todos;
-  
-
-const setData = async () => {   
-    await Auth.currentUserInfo()
-      .then(async (data) => {
-        setUserId(data.attributes.name);
-        console.log(`DATA: ${JSON.stringify(data)}`);
-        getToken();
-         const todos = await axios.get(
-         "http://localhost:5000/4962f78d-e33f-4eb0-b6cc-058330ab54b4"
-         );
-          setTodos(todos.data);
-      })
-      .catch(error => console.log(`Error: ${error.message}`));
-  };
-
-
-async function getToken() {
-  try {
-    const session = await Auth.currentSession();
-    const idToken = session.getIdToken().getJwtToken();
-    console.log('ID Token:', idToken);
-  } catch (error) {
-    console.error('Error getting token:', error);
-  }
-}
-
-// Call getToken() when needed
-
 
  useEffect(() => {
-
- setData();
- });
-
- const handleLogout = async () => {
-     try {
-       await Auth.signOut();
-       Toast("Success!!", "Logged out successfully!", "success");
-       history.push("/signin");
-     } catch (error) {
-       Toast("Error!!", error.message, "danger");
-     }
-   };
-
-   
+ (async () => {
+ const todos = await axios.get(
+ "https://jsonplaceholder.typicode.com/todos"
+ );
+ setTodos(todos.data);
+ })();
+ }, []);
 
   const columns = useMemo(
     () => [
@@ -97,23 +53,11 @@ async function getToken() {
     headerGroups,
     rows,
     prepareRow,
-    setSortBy,
-    page,
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize }
+    setSortBy
   } = useTable({
     columns,
     data: todos,
      initialState: {
-                pageSize: 5,
-                pageIndex: 0,
                 sortBy: [
                     {
                         id: 'effortRequired',
@@ -121,16 +65,42 @@ async function getToken() {
                     }
                 ]
             }
-  }, useSortBy, usePagination);
+  }, useSortBy);
 
   return (
     <div className="list row">
-    <h4>Welcome {userId}!</h4>
-       <div className="col-md-12" style={{marginTop: '10px'}} >
-        <button className="btn btn-sm btn-danger" onClick={handleLogout}>
-          Logout
-        </button>
-       </div>
+      <div className="col-md-12 list">
+        <table
+          className="table table-striped table-bordered"
+          {...getTableProps()}
+        >
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps()}>
+                    {column.render("Header")}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row, i) => {
+              prepareRow(row);
+              return (
+                <tr data-testid='todo' {...row.getRowProps()}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
